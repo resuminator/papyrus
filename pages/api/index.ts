@@ -19,39 +19,14 @@
 */
 
 import type { NextApiRequest, NextApiResponse } from "next";
+import allowCors from "../../middleware/allowCors";
 import { getBrowserInstance } from "../../src/browser";
 
-const allowCors =
-  (fn: (req: any, res: any) => any) =>
-  async (
-    req: { method: string },
-    res: {
-      setHeader: (arg0: string, arg1: string | boolean) => void;
-      status: (arg0: number) => {
-        (): any;
-        new (): any;
-        end: { (): void; new (): any };
-      };
-    }
-  ) => {
-    res.setHeader("Access-Control-Allow-Credentials", true);
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    // another common pattern
-    // res.setHeader('Access-Control-Allow-Origin', req.headers.origin);
-    res.setHeader(
-      "Access-Control-Allow-Methods",
-      "GET,OPTIONS,PATCH,DELETE,POST,PUT"
-    );
-    res.setHeader("Access-Control-Allow-Headers", "*");
-    if (req.method === "OPTIONS") {
-      res.status(200).end();
-      return;
-    }
-    return await fn(req, res);
-  };
-
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+  //APP Endpoint
   const APP = process.env.NEXT_PUBLIC_R8;
+
+  //If not loaded environment variable, return 500
   if (!APP) return res.status(500).json({ message: "Invalid Config" });
 
   /** Load the required browser instance
@@ -64,9 +39,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const id = req.query.id ? req.query.id.toString() : null;
     const token = req.headers.authorization;
 
-    //If no id or token, return 401
+    //If no id return 401
     if (!id) return res.status(401).json({ message: "Invalid Request" });
 
+    //If no token return 403
     if (!token)
       return res
         .status(403)
@@ -101,11 +77,16 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       },
       pageRanges: "1",
     });
+
+    //LOG Sucess
     console.log("File Generated", new Date().toLocaleTimeString());
 
+    //Set required response headers
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader("Content-Length", file.length);
     res.status(200).send(file);
+
+    //Log completion
     console.info("[SUCCESS] PDF Generated");
   } catch (e) {
     console.error("[ERROR] PDF Generation Failed");
@@ -114,6 +95,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     res.end("<h1>Internal Error</h1><p>Sorry, there was a problem</p>");
     console.error(e);
   } finally {
+    //Close browser instance
     if (browser !== null) {
       await browser.close();
     }
