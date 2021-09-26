@@ -113,6 +113,10 @@
   margin-left: 0.5rem;
 }
 
+.link {
+  color: #0070f3;
+}
+
 @media (max-width: 600px) {
   .grid {
     width: 100%;
