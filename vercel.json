@@ -1,6 +1,6 @@
 {
   "functions": {
-    "api/index.ts": {
+    "pages/api/index.ts": {
       "memory": 1024
     }
   }
