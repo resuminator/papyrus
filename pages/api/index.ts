@@ -21,10 +21,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import allowCors from "../../middleware/allowCors";
 import { getBrowserInstance } from "../../src/browser";
-import os from 'os';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  console.log(`Memory = ${os.totalmem() / (1024 * 1024)}MB`);
   //APP Endpoint
   const APP = process.env.NEXT_PUBLIC_R8;
 
