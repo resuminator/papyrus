@@ -23,6 +23,7 @@ import allowCors from "../../middleware/allowCors";
 import { getBrowserInstance } from "../../src/browser";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+  const start = new Date().getTime();
   //APP Endpoint
   const APP = process.env.NEXT_PUBLIC_R8;
 
@@ -88,12 +89,20 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     //Log completion
     console.info("[SUCCESS] PDF Generated");
+
+    const end = new Date().getTime();
+    console.log(`Time taken: ${(end - start)/1000} seconds`);
+
   } catch (e) {
     console.error("[ERROR] PDF Generation Failed");
     res.statusCode = 500;
     res.setHeader("Content-Type", "text/html");
     res.end("<h1>Internal Error</h1><p>Sorry, there was a problem</p>");
     console.error(e);
+
+    const end = new Date().getTime();
+    console.log(`Time taken: ${(end - start)/1000} seconds`);
+    
   } finally {
     //Close browser instance
     if (browser !== null) {
